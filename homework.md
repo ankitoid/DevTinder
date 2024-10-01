@@ -1,0 +1,8 @@
+-create a repository
+- Initiaize the repository
+- node modules, package.json, package-lock.json
+-i express
+- create server
+- listen to port
+- i nodemon
+- difference between caret and tidle ( ^ vs ~)
