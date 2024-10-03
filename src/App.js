@@ -2,8 +2,6 @@ const express = require("express");
 const connectDB = require('./Config/database');
 const app = express();
 
-const User = require("./models/user");
-
 app.post("/signup",async(req,res)=>{
     const user = new User({
         firstName : "Virat",
@@ -29,4 +27,3 @@ connectDB().then(() => {
 }).catch(err => {
     console.error("databse is not connected");
 })
-
