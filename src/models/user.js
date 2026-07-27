@@ -27,11 +27,11 @@ const userSchema = new mongoose.Schema(
 
     gender: {
       type: String,
-      validate(value) {
-        if (!["male", "female", "others"].includes(value)) {
-          throw new Error("Invalid Gender");
-        }
+      enum: {
+        values: ["male", "female", "others"],
+        message: `{VALUE} is incorrect gender`,
       },
+      required: true,
     },
   },
   {
@@ -39,18 +39,24 @@ const userSchema = new mongoose.Schema(
   }
 );
 
+// User.find({firstName:"Ankit" , lastName:"Singh"})
+// userSchema.index({firstName:1,lastName:1});
+userSchema.index({ firstName: 1 });
+userSchema.index({ lastName: 1 });
+
+
 userSchema.methods.getJWT = async function () {
 
   const user = this;
   
   const token = await jwt.sign({ _id: user._id }, "DEV@Tinder$26", {
-    expiresIn: "1h",
+    expiresIn: "7d",
   });
 
   return token;
 };
 
-userSchema.methods.validatePassword = async function (passwordInputByUser) {
+userSchema.methods.validatePassword = async function (passwordInputByUser)  {
 
   const user = this;
   const passwordHash = user.password;

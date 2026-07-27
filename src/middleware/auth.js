@@ -2,34 +2,32 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 
 const userAuth = async (req, res, next) => {
- try {
-   // Read the token from the request coookies
+  try {
+    const { token } = req.cookies;
+    if (!token) {
+      return res.status(401).send("Please Login!");
+    }
 
-   const cookies = req.cookies;
+    const decodedObj = await jwt.verify(token, "DEV@Tinder$26");
 
-   const {token} = cookies;
-   if(!token){
-     throw new Error("Token in not  Valid !!!!!");
-   }
+    const { _id } = decodedObj;
 
-   const decodedObj = await jwt.verify(token,"DEV@Tinder$26");
+    const user = await User.findById(_id);
+    if (!user) {
+      throw new Error("User not found");
+    }
 
-   const {_id} = decodedObj; 
-
-   // Find the user
-   const user = await User.findById(_id);
-   if(!user){
-     throw new Error("User not found");
-   }
-   req.user = user;
-   next(); // to move to request handler
- 
-   
+    req.user = user;
+    next();
+  } catch (err) {
+    if (err.name === "TokenExpiredError") {
+      return res.status(401).json({ message: "Your session has expired. Please log in again." });
+    } else if (err.name === "JsonWebTokenError") {
+      return res.status(401).json({ message: "Invalid token. Please log in again." });
+    }
     
- } catch (err) {
-    res.status(400).send("Error: "+err.message);
- }
-
+    // For other errors, send a generic error message
+    res.status(400).send("Authentication error: " + err.message);  }
 };
 
 module.exports = {
